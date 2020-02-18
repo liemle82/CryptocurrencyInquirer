@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
@@ -15,6 +16,8 @@ namespace CryptocurrencyInquirer
     public partial class Form1 : Form
     {
         public List<CryptocurrencyInfo> CryptocurrencyInfoList;
+        string CryptocurrencyInfoListFilePath = @"CryptocurrencyInfoList.txt";
+
         public Form1()
         {
             InitializeComponent();
@@ -44,12 +47,15 @@ namespace CryptocurrencyInquirer
 
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            saveCryptocurrencyInfoListToPhysicalFile();
             Close();
         }
 
         private void Form1_Load(object sender, EventArgs e)
         {
             CryptocurrencyInfoList = new List<CryptocurrencyInfo>();
+            loadCryptocurrencyInfoListToPhysicalFile();
+
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -57,21 +63,27 @@ namespace CryptocurrencyInquirer
 
             if (ccTickerTbx.Text != string.Empty)
             {
-                requestPrice(ccTickerTbx.Text);
 
-                GrpBxCryptocurrencyWatchlist.Visible = true;
+                requestOrUpdatePrice(ccTickerTbx.Text);
+
                 AddCyrptocurrencyInquiryGrpBx.Visible = false;
-
-                CryptocurrencyWatchListLabel.Text = string.Empty;
-                foreach (var cci in CryptocurrencyInfoList)
-                {
-                    CryptocurrencyWatchListLabel.Text += cci.ticker + ": " + Math.Round(cci.price, 2).ToString() + "\n";
-                }
+                loadGrpBxCryptocurrencyWatchlist();
 
             }
         }
 
-        private void requestPrice(string ccTicker)
+        private void loadGrpBxCryptocurrencyWatchlist()
+        {
+            GrpBxCryptocurrencyWatchlist.Visible = true;
+
+            CryptocurrencyWatchListLabel.Text = string.Empty;
+            foreach (var cci in CryptocurrencyInfoList)
+            {
+                CryptocurrencyWatchListLabel.Text += cci.ticker + ": " + Math.Round(cci.price, 2).ToString() + "\n";
+            }
+        }
+
+        private void requestOrUpdatePrice(string ccTicker)
         {
             string ccTickerFormatted = ccTicker.Trim().ToUpper();
             string url = "https://api.binance.com/api/v1/ticker/price?symbol=" + ccTickerFormatted + "USDT";
@@ -98,8 +110,13 @@ namespace CryptocurrencyInquirer
                     cci.price = binanceJson.price;
                     CryptocurrencyInfoList.Add(cci);
                 }
+                else
+                {
+                    CryptocurrencyInfoList[index].price = binanceJson.price;
+                }
             }
-            catch (Exception ex) {
+            catch (Exception ex) 
+            {
                 Console.Write(ex.ToString());
             }
 
@@ -125,16 +142,15 @@ namespace CryptocurrencyInquirer
                         cci.price = binanceJson.price;
                         CryptocurrencyInfoList.Add(cci);
                     }
+                    else
+                    {
+                        CryptocurrencyInfoList[index].price = binanceJson.price;
+                    }
                 }
                 catch (Exception ex)
                 {
                     Console.Write(ex.ToString());
                 }
-            }
-
-            if (json != string.Empty)
-            {
-
             }
 
         }
@@ -178,5 +194,46 @@ namespace CryptocurrencyInquirer
             GrpBxCryptocurrencyWatchlist.Visible = false;
 
         }
+
+        private void saveCryptocurrencyInfoListToPhysicalFile()
+        {
+
+            var json = JsonConvert.SerializeObject(CryptocurrencyInfoList);
+
+            //if (!File.Exists(CryptocurrencyInfoListFilePath))
+            {
+                // Create a file to write to.
+                using (StreamWriter sw = File.CreateText(CryptocurrencyInfoListFilePath))
+                {
+                    sw.WriteLine(json.ToString());
+                }
+            }
+        }
+
+        private void loadCryptocurrencyInfoListToPhysicalFile()
+        {
+            string fileContents = string.Empty;
+
+            using (StreamReader sr = File.OpenText(CryptocurrencyInfoListFilePath))
+            {
+                string s = string.Empty;
+                while ((s = sr.ReadLine()) != null)
+                {
+                    fileContents += s;
+                }
+            }
+
+            dynamic fileContentsJson = JsonConvert.DeserializeObject(fileContents);
+            foreach (var cci in fileContentsJson)
+            {
+                string ticker = cci.ticker;
+                requestOrUpdatePrice(ticker.Replace("{","").Replace("}",""));
+                
+            }
+
+            loadGrpBxCryptocurrencyWatchlist();
+
+        }
+
     }
 }

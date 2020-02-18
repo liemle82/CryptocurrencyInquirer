@@ -74,7 +74,6 @@
             this.priceInquireToolStripMenuItem.Name = "priceInquireToolStripMenuItem";
             this.priceInquireToolStripMenuItem.Size = new System.Drawing.Size(143, 22);
             this.priceInquireToolStripMenuItem.Text = "Price Inquire";
-            this.priceInquireToolStripMenuItem.Click += new System.EventHandler(this.priceInquireToolStripMenuItem_Click);
             // 
             // addToolStripMenuItem
             // 
@@ -102,7 +101,6 @@
             this.ccTickerTbx.Name = "ccTickerTbx";
             this.ccTickerTbx.Size = new System.Drawing.Size(31, 20);
             this.ccTickerTbx.TabIndex = 1;
-            this.ccTickerTbx.TextChanged += new System.EventHandler(this.textBox1_TextChanged);
             // 
             // label1
             // 
@@ -112,7 +110,6 @@
             this.label1.Size = new System.Drawing.Size(114, 13);
             this.label1.TabIndex = 2;
             this.label1.Text = "Cryptocurrency Ticker:";
-            this.label1.Click += new System.EventHandler(this.label1_Click);
             // 
             // btnAddCryptocurrencyInquiry
             // 
