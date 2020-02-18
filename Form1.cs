@@ -47,7 +47,6 @@ namespace CryptocurrencyInquirer
 
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            saveCryptocurrencyInfoListToPhysicalFile();
             Close();
         }
 
@@ -114,6 +113,7 @@ namespace CryptocurrencyInquirer
                 {
                     CryptocurrencyInfoList[index].price = binanceJson.price;
                 }
+                saveCryptocurrencyInfoListToPhysicalFile();
             }
             catch (Exception ex) 
             {
@@ -146,6 +146,7 @@ namespace CryptocurrencyInquirer
                     {
                         CryptocurrencyInfoList[index].price = binanceJson.price;
                     }
+                    saveCryptocurrencyInfoListToPhysicalFile();
                 }
                 catch (Exception ex)
                 {
